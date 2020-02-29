@@ -1,0 +1,9 @@
+# vscode
+.vscode/
+
+# configs
+config/cfg.toml
+
+# builds
+scrapper/scrapper
+fuelfor.cheap-api
