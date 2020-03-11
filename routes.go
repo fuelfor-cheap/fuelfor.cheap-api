@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 	"github.com/lynnau/fuelfor.cheap-api/config"
 	"github.com/lynnau/fuelfor.cheap-api/controllers"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 // Server ...

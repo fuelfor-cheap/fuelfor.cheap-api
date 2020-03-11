@@ -13,9 +13,10 @@ import (
 )
 
 var (
-	uri            = "https://711-goodcall.api.tigerspike.com/api/v1"
-	deviceName     = "SM-G973FZKAXSA"
-	appVersion     = "1.8.0.2027"
+	uri        = "https://711-goodcall.api.tigerspike.com/api/v1"
+	deviceName = "SM-G973FZKAXSA"
+	// appVersion     = "1.8.0.2027"
+	appVersion     = "1.10.2044"
 	androidVersion = "Android 9.0.0"
 
 	encryptionKey []byte
