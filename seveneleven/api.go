@@ -146,7 +146,8 @@ func Lock(latitude, longitude float64, accessToken, deviceSecret, deviceID, fuel
 
 lockin:
 	// calculate a few things like how many litres we want to lock in, etc.
-	litresToLock := int(lockSessResp.Balance / fuelPrice * 100)
+	// litresToLock := int(lockSessResp.Balance / fuelPrice * 100)
+	litresToLock := 150
 	payload = fmt.Sprintf("{\"AccountId\":\"%s\",\"FuelType\":\"%d\",\"NumberOfLitres\":\"%d\"}", accountID, matchingEan, litresToLock)
 
 	url = uri + "/FuelLock/Confirm"
