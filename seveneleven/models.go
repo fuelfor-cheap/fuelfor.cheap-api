@@ -1,5 +1,6 @@
 package seveneleven
 
+// these structs are the return values from the 7/11 api
 // some fields have been commented out because they are not relevant to this application
 
 // LoginPayload ...
@@ -45,4 +46,17 @@ type LockSessionResponse struct {
 		} `json:"FuelPrices"`
 	} `json:"CheapestFuelTypeStores"`
 	Balance float64 `json:"Balance"`
+}
+
+// LockResponse ...
+type LockResponse struct {
+	ID             string  `json:"Id"`
+	Status         int     `json:"Status"`
+	CouponCode     string  `json:"CouponCode"`
+	FuelGradeModel int     `json:"FuelGradeModel"`
+	CentsPerLitre  float64 `json:"CentsPerLitre"`
+	TotalLitres    float64 `json:"TotalLitres"`
+	StoreID        string  `json:"StoreId"`
+	ExpiresAt      float64 `json:"ExpiresAt"`
+	CreatedAt      float64 `json:"CreatedAt"`
 }

@@ -13,6 +13,7 @@ import (
 )
 
 var (
+	// hardcoded constants required for making requests to the 7/11 api
 	uri        = "https://711-goodcall.api.tigerspike.com/api/v1"
 	deviceName = "SM-G973FZKAXSA"
 	// appVersion     = "1.8.0.2027"
@@ -23,15 +24,16 @@ var (
 )
 
 // Login ...
-func Login(email, password, accessToken string) (*LoginResponse, string, string) {
+func Login(email, password, accessToken, deviceID string) (*LoginResponse, string, string) {
 	// create the payload
 	payload := fmt.Sprintf("{\"Email\":\"%s\",\"Password\":\"%s\",\"DeviceName\":\"%s\",\"DeviceOsNameVersion\":\"%s\"}", email, password, deviceName, androidVersion)
 
-	// generate a unique device id
-	characters := strings.Split("0123456789abcdef", "")
-	deviceID := ""
-	for i := 0; i < 16; i++ {
-		deviceID += characters[rand.Intn(len(characters)-0)+0]
+	if deviceID == "" {
+		// generate a unique device id
+		characters := strings.Split("0123456789abcdef", "")
+		for i := 0; i < 16; i++ {
+			deviceID += characters[rand.Intn(len(characters)-0)+0]
+		}
 	}
 
 	url := uri + "/account/login"
@@ -47,6 +49,7 @@ func Login(email, password, accessToken string) (*LoginResponse, string, string)
 	if err != nil {
 		panic(err)
 	}
+	// add all the headers required for authentication
 	req.Header.Add("User-Agent", "Apache-HttpClient/UNAVAILABLE (java 1.4)")
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")
 	req.Header.Add("Connection", "Keep-Alive")
@@ -57,20 +60,18 @@ func Login(email, password, accessToken string) (*LoginResponse, string, string)
 	req.Header.Add("X-DeviceID", deviceID)
 	req.Header.Add("X-AppVersion", appVersion)
 
+	// send the request
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		panic(err)
 	}
 	defer resp.Body.Close()
 
+	// read the body and pipe it into a known struct
 	bits, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Printf("resp headers %+v\n", resp.Header)
-	fmt.Println(string(bits))
-
 	loginResp := &LoginResponse{}
 	if err = json.Unmarshal(bits, loginResp); err != nil {
 		panic(err)
@@ -80,7 +81,7 @@ func Login(email, password, accessToken string) (*LoginResponse, string, string)
 }
 
 // Lock ...
-func Lock(latitude, longitude float64, accessToken, deviceSecret, deviceID, fuelType, accountID string) {
+func Lock(latitude, longitude float64, accessToken, deviceSecret, deviceID, fuelType, accountID string) *LockResponse {
 	// timestamp, seconds since epoch
 	now := time.Now().Unix()
 
@@ -101,6 +102,7 @@ func Lock(latitude, longitude float64, accessToken, deviceSecret, deviceID, fuel
 		panic(err)
 	}
 
+	// decrypt our device id into a "mob id"?
 	vMobID := desDecryptString(deviceID)
 
 	req.Header.Add("User-Agent", "Apache-HttpClient/UNAVAILABLE (java 1.4)")
@@ -124,29 +126,12 @@ func Lock(latitude, longitude float64, accessToken, deviceSecret, deviceID, fuel
 		panic(err)
 	}
 
-	fmt.Println(string(bits))
 	lockSessResp := &LockSessionResponse{}
 	if err = json.Unmarshal(bits, lockSessResp); err != nil {
 		panic(err)
 	}
 
-	fuelPrice := float64(0)
 	matchingEan := fuelTypeToEan[fuelType]
-	// loop over the fuel prices,
-	// at the nearby stores,
-	// to find the best price for our matching fuel type that was passed
-	for _, store := range lockSessResp.CheapestFuelTypeStores {
-		for _, price := range store.FuelPrices {
-			if price.Ean == matchingEan {
-				fuelPrice = price.Price
-				goto lockin
-			}
-		}
-	}
-
-lockin:
-	// calculate a few things like how many litres we want to lock in, etc.
-	// litresToLock := int(lockSessResp.Balance / fuelPrice * 100)
 	litresToLock := 150
 	payload = fmt.Sprintf("{\"AccountId\":\"%s\",\"FuelType\":\"%d\",\"NumberOfLitres\":\"%d\"}", accountID, matchingEan, litresToLock)
 
@@ -183,10 +168,59 @@ lockin:
 		panic(err)
 	}
 
-	fmt.Println(string(bits))
+	lockResp := &LockResponse{}
+	if err = json.Unmarshal(bits, lockResp); err != nil {
+		panic(err)
+	}
+	return lockResp
+}
+
+// GetLock ...
+func GetLock(accessToken, deviceSecret, deviceID string) []*LockResponse {
+	url := uri + "/FuelLock/List"
+	method := "GET"
+	tssa, err := generateTSSA(url, method, "", accessToken)
+	if err != nil {
+		fmt.Println("err", err)
+		panic(err)
+	}
+
+	// send a request to the 7/11 api now with our setup headers
+	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	req.Header.Add("User-Agent", "Apache-HttpClient/UNAVAILABLE (java 1.4)")
+	req.Header.Add("Authorization", tssa)
+	req.Header.Add("X-OsVersion", androidVersion)
+	req.Header.Add("X-OsName", "Android")
+	req.Header.Add("X-DeviceID", deviceID)
+	req.Header.Add("X-AppVersion", appVersion)
+	req.Header.Add("X-DeviceSecret", deviceSecret)
+	req.Header.Add("Content-Type", "application/json; charset=utf-8")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	bits, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	lockResp := []*LockResponse{}
+	if err = json.Unmarshal(bits, &lockResp); err != nil {
+		panic(err)
+	}
+	return lockResp
 }
 
 func init() {
+	// generate our encryption key on startup
+	// we'll need this when creating the tssa values
 	var err error
 	key := generateKey()
 	encryptionKey, err = base64.StdEncoding.DecodeString(key)

@@ -7,3 +7,7 @@ config/cfg.toml
 # builds
 scrapper/scrapper
 fuelfor.cheap-api
+fuelfor.cheap-api.exe
+
+# deployment?
+node_modules

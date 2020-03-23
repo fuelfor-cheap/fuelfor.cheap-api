@@ -9,17 +9,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func invalidScemaError() gin.H {
-	schema, err := json.Marshal(&models.LoginDetails{})
+func invalidScemaError(scheme interface{}) gin.H {
+	schema, err := json.Marshal(scheme)
 	if err != nil {
 		panic(err)
 	}
 
 	return gin.H{
 		"error":   true,
-		"message": "malformed login details, request body should follow the follwing schema",
+		"message": "malformed payload details, request body should follow the follwing schema",
 		"schema":  string(schema),
-		"notes":   "the access_token in the schema is optional",
 	}
 }
 
@@ -28,18 +27,18 @@ func Login(ctx *gin.Context) {
 	details := &models.LoginDetails{}
 	err := ctx.ShouldBind(details)
 	if err != nil {
-		ctx.JSON(500, invalidScemaError())
+		ctx.JSON(500, invalidScemaError(details))
 		return
 	}
 
 	// check if the email and or password is intact
 	if details.Email == "" || details.Password == "" {
-		ctx.JSON(500, invalidScemaError())
+		ctx.JSON(500, invalidScemaError(details))
 		return
 	}
 
 	// log the user in and return the api response from 7/11
-	response, accessToken, deviceID := seveneleven.Login(details.Email, details.Password, details.AccessToken)
+	response, accessToken, deviceID := seveneleven.Login(details.Email, details.Password, details.AccessToken, details.DeviceID)
 
 	ctx.Header("X-Accesstoken", accessToken)
 	ctx.Header("X-DeviceID", deviceID)

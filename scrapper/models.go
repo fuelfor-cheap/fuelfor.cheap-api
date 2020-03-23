@@ -1,4 +1,4 @@
-package scrapper
+package main
 
 // ProjectZeroThreeAPIResponse is the top level response from the api
 type ProjectZeroThreeAPIResponse struct {

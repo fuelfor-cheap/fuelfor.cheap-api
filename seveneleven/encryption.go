@@ -42,14 +42,10 @@ func desDecryptString(deviceID string) string {
 		panic(err)
 	}
 
-	// cipher, err := des.NewCipher([]byte(key))
-
-	// encryptedMsg := []byte{}
-	// cipher.Encrypt(encryptedMsg, []byte(fmt.Sprintf("%s%s", prefix, deviceID)))
-
 	// return the encrypted message back, base64 encoded
 	encoded := base64.StdEncoding.EncodeToString(encrypted)
 	encoded = strings.ReplaceAll(encoded, "/", "_")
 
+	// the encoded string must be suffixed with an underscore
 	return fmt.Sprintf("%s_", encoded)
 }

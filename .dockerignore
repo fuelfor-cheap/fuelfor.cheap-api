@@ -1,2 +1,9 @@
 .vscode
 scrapper/scrapper
+node_modules
+
+fuelfor.cheap-api
+fuelfor.cheap-api.exe
+package*.json
+scrapper-cron
+*.Dockerfile

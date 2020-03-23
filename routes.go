@@ -21,6 +21,10 @@ func init() {
 
 	// create the routes
 	api := Server.Group("/api/v1")
-	api.POST("/login", controllers.Login)
-	api.POST("/lock", controllers.Lock)
+	api.POST("/lock", controllers.NewLock)
+	api.POST("/lock/existing", controllers.GetExistingLock)
+
+	// sessions
+	sessions := api.Group("/sessions")
+	sessions.POST("/login", controllers.Login)
 }
