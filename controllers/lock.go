@@ -60,12 +60,19 @@ func GetExistingLock(ctx *gin.Context) {
 		fuelType := seveneleven.EanToFuelType[resp.FuelGradeModel]
 		expires := time.Unix(int64(resp.ExpiresAt), 0)
 
+		// lock status
+		// 0 = active, 1 = expired, 2 = redeemed
+
 		lock := &models.Lock{
 			FuelType:      fuelType,
 			CentsPerLitre: resp.CentsPerLitre,
 			// TotalLitres: resp.TotalLitres,
 			Expires: expires,
 		}
+		if resp.Status == 2 {
+			lock.HasRedeemed = true
+		}
+
 		locks = append(locks, lock)
 	}
 

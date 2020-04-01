@@ -17,6 +17,7 @@ type LockPayload struct {
 type Lock struct {
 	FuelType      string  `json:"fuel_type"`
 	CentsPerLitre float64 `json:"cents_per_litre"`
+	HasRedeemed   bool    `json:"has_redeemed"`
 	// TotalLitres   float64   `json:"total_litres"`
 	Expires time.Time `json:"expires"`
 }
