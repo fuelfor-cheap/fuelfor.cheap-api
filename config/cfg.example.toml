@@ -2,9 +2,3 @@ port=":8080"
 
 [cors]
 origins=["http://localhost:5000"]
-
-[priceapi]
-uri="https://projectzerothree.info/api.php?format=json"
-
-[db]
-uri="postgres://localhost/fuels"

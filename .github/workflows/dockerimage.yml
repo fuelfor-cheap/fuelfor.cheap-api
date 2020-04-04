@@ -9,13 +9,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - uses: actions/setup-go@v1
         with:
           go-version: 1.13
         id: go
+
       - uses: azure/docker-login@v1
         with:
-          login-server: rg.nl-ams.scw.cloud/lynn
+          login-server: rg.fr-par.scw.cloud/fuelforcheap
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
@@ -30,7 +32,9 @@ jobs:
           GO111MODULE: 'on'
           CGO_ENABLED: 0
           GOOS: linux
+
       - name: build the image
-        run: docker build . -t rg.nl-ams.scw.cloud/lynn/fuelforcheap-api:latest
+        run: docker build . -t rg.fr-par.scw.cloud/fuelforcheap/api:latest
+
       - name: push the image
-        run: docker push rg.nl-ams.scw.cloud/lynn/fuelforcheap-api:latest
+        run: docker push rg.fr-par.scw.cloud/fuelforcheap/api:latest
