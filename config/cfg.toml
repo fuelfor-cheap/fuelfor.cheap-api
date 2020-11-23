@@ -1,0 +1,7 @@
+port=":1337"
+
+[cors]
+origins=["https://fuelfor.cheap","http://localhost:5000"]
+
+[graphql]
+host="https://api.fuelfor.cheap/v1/graphql"

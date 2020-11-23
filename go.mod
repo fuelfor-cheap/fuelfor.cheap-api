@@ -9,6 +9,7 @@ require (
 	github.com/go-pg/pg/v9 v9.1.1
 	github.com/go-pg/urlstruct v0.3.0 // indirect
 	github.com/google/uuid v1.1.1
+	github.com/machinebox/graphql v0.2.2 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/segmentio/encoding v0.1.10 // indirect
